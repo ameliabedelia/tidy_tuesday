@@ -5,7 +5,7 @@ library(ggthemes)
 tidy_anime <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-04-23/tidy_anime.csv")
 
 score_summary <- tidy_anime %>%
-     na.omit(studio) %>%  
+     filter(!is.na(studio)) %>%  
      group_by(studio) %>%
      summarise(
           n = n(),
