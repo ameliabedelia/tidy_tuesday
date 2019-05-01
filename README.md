@@ -6,7 +6,7 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
-**[2019-04-30_bird-collisions.R](code/2019-04-30_bird-collisions.R)**
+**[2019-04-30_Bird Collisions](code/2019-04-30_bird-collisions.R)**
 (plots/bird_collisions.png)
 
 **[2019-04-23 Anime](code/2019-04-23-anime.R)**
