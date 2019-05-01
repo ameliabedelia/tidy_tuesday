@@ -7,7 +7,7 @@ More info at https://github.com/rfordatascience/tidytuesday
 ### Contributions ###
 
 **[2019-04-30 Bird Collisions](code/2019-04-30_bird-collisions.R)**
-(plots/bird_collisions.png)
+![bird collision plot](plots/bird_collisions.png)
 
 **[2019-04-23 Anime](code/2019-04-23-anime.R)**
-(plots/studio_rating.png)
+![anime plot](plots/studio_rating.png)
