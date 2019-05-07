@@ -1,32 +1,42 @@
 library(tidyverse)
 library(viridis)
+library(paletteer)
+library(ggrepel)
 
+#datasets ----
+# map
 map_data <- map_data("world")
 
-student_ratio <- read_csv("D:/student_teacher_ratio.csv")
+#raw
+student_ratio <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-07/student_teacher_ratio.csv")
 
+#fix Europe country names for mapping
 student_ratio <- student_ratio %>% 
      mutate(
           country = str_replace_all(country, c("Czechia" = "Czech Republic",
-                                   "United Kingdom of Great Britain and Northern Ireland" = "UK",
-                                   "Russian Federation" = "Russia",
-                                   "Republic of Moldova" = "Moldova",
-                                   "The former Yugoslav Republic of Macedonia" = "Macedonia")),
-          # indicator = factor(indicator, levels = c("Pre-Primary Education",
-          #                                          "Primary Education",
-          #                                          "Lower Secondary Education",
-          #                                          "Upper Secondary Education",
-          #                                          "Secondary Education",
-          #                                          "Post-Secondary Non-Tertiary Education",
-          #                                          "Tertiary Education"
-          #                                          )),
-          indicator = as_factor(indicator),
-          indicator = fct_collapse(indicator, "Primary Education" = c("Pre-Primary Education","Primary Education"),
-                                   "Secondary Education" = c("Lower Secondary Education", "Upper Secondary Education",
-                                                 "Secondary Education"),
-                                   "Post-secondary Education" = c("Post-Secondary Non-Tertiary Education",
-                                                                  "Tertiary Education"))
+                                               "United Kingdom of Great Britain and Northern Ireland" = "UK",
+                                               "Russian Federation" = "Russia",
+                                               "Republic of Moldova" = "Moldova",
+                                               "The former Yugoslav Republic of Macedonia" = "Macedonia")),
+          indicator = factor(indicator, levels = c("Pre-Primary Education",
+                                                   "Primary Education",
+                                                   "Lower Secondary Education",
+                                                   "Upper Secondary Education",
+                                                   "Secondary Education",
+                                                   "Post-Secondary Non-Tertiary Education",
+                                                   "Tertiary Education"
+                                                   ))
      )
+
+ student_ratio_collapse <- student_ratio %>% 
+      mutate(indicator = fct_collapse(indicator, 
+                                        "Primary Education" = c("Pre-Primary Education","Primary Education"),
+                                        "Secondary Education" = c("Lower Secondary Education", "Upper Secondary Education",
+                                                                      "Secondary Education"),
+                                        "Post-secondary Education" = c("Post-Secondary Non-Tertiary Education",
+                                                                           "Tertiary Education"))
+      )
+
 
 EU_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", 
                   "Czech Republic", "Denmark", "Estonia", "Finland", "France", 
@@ -52,6 +62,9 @@ EU_data <- student_ratio %>%
 EU_primary <- EU_data %>% 
      filter(indicator == "Primary Education")
 
+EU_secondary <- EU_data %>% 
+     filter
+
 # EU_data %>% distinct(country)
 # intersect(map_data$region, EU_data$country)
 # intersect(Europe_countries, student_ratio$country)
@@ -69,7 +82,7 @@ EU_summary <-  EU_data %>%
                median =median(student_ratio, na.rm = TRUE)) %>%
      ungroup()
 
-     
+
 EU_summary %>% 
      ggplot(aes(fct_reorder2(country, fct_rev(indicator), average), average, color = indicator)) +
      geom_point() +
@@ -83,22 +96,46 @@ EU_summary %>%
      facet_wrap(vars(country), scales = "free") 
 
 ### Eu Primary Map ----
+EU_names <- map_data %>% 
+     filter(region %in% EU_countries) %>%
+     group_by(region) %>%
+     summarise(mean_lat = mean(lat),
+               mean_long = mean(long)) %>% 
+     ungroup()
+
 EU_primary %>%
      group_by(country) %>% 
      summarise(n = n(),
                average = mean(student_ratio, na.rm = TRUE)
-               ) %>% 
+     ) %>% 
      left_join(map_data, by = c("country" = "region")) %>% 
-     ggplot(aes(x = long, y = lat, group = group)) +
-     geom_polygon(aes(fill = average)) +
+     ggplot(aes(x = long, y = lat)) +
+     geom_polygon(aes(fill = average, group = group)) +
+     #geom_text(data = EU_names, aes(mean_long, mean_lat, label = region), 
+           #          size = 3, color = "yellow") +
      coord_map() +
      theme_minimal() +
      scale_fill_viridis_c(option = "D")
-
+     #scale_fill_paletteer_c("scico", "tokyo")
 
 ### Europe Primary Ed Map ----
-student_ratio %>% 
+primary <- student_ratio %>% 
      filter(country %in% Europe_countries, indicator == "Primary Education") %>%
+     filter(country !="Russia", country != "Iceland") %>% 
+     group_by(country) %>% 
+     summarise(
+          n = n(),
+          average = mean(student_ratio, na.rm = TRUE)
+     ) %>% 
+     left_join(map_data, by = c("country" = "region")) %>% 
+     ggplot(aes(x = long, y = lat)) +
+     geom_polygon(aes(fill = average, group = group)) +
+     coord_map(ylim = c(30, 72)) +
+     theme_minimal() +
+     scale_fill_viridis_c(option = "D")
+
+secondary <- student_ratio_collapse %>% 
+     filter(country %in% Europe_countries, indicator == "Secondary Education") %>%
      filter(country !="Russia") %>% 
      group_by(country) %>% 
      summarise(
