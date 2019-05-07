@@ -106,8 +106,8 @@ student_ratio %>%
           average = mean(student_ratio, na.rm = TRUE)
      ) %>% 
      left_join(map_data, by = c("country" = "region")) %>% 
-     ggplot(aes(x = long, y = lat, group = group)) +
-     geom_polygon(aes(fill = average)) +
+     ggplot(aes(x = long, y = lat)) +
+     geom_polygon(aes(fill = average, group = group)) +
      coord_map(ylim = c(30, 72)) +
      theme_minimal() +
-     scale_fill_viridis_c(option = "D") 
+     scale_fill_viridis_c(option = "D")
