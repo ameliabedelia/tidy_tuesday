@@ -5,7 +5,11 @@ library(ggrepel)
 
 #datasets ----
 # map
-map_data <- map_data("world")
+map_data <- map_data("world") %>%
+     left_join(country_codes, by = c("region" = "mapname")) %>% 
+     as_tibble()
+     
+country_codes <- as_tibble(maps::iso3166)
 
 #raw
 student_ratio <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-07/student_teacher_ratio.csv")
@@ -25,17 +29,16 @@ student_ratio <- student_ratio %>%
                                                    "Secondary Education",
                                                    "Post-Secondary Non-Tertiary Education",
                                                    "Tertiary Education"
-                                                   ))
+          ))
      )
 
- student_ratio_collapse <- student_ratio %>% 
-      mutate(indicator = fct_collapse(indicator, 
-                                        "Primary Education" = c("Pre-Primary Education","Primary Education"),
-                                        "Secondary Education" = c("Lower Secondary Education", "Upper Secondary Education",
-                                                                      "Secondary Education"),
-                                        "Post-secondary Education" = c("Post-Secondary Non-Tertiary Education",
-                                                                           "Tertiary Education"))
-      )
+student_ratio_collapse <- student_ratio %>% 
+     mutate(indicator = fct_collapse(indicator, 
+                                     "Secondary Education" = c("Lower Secondary Education", "Upper Secondary Education",
+                                                               "Secondary Education"),
+                                     "Post-secondary Education" = c("Post-Secondary Non-Tertiary Education",
+                                                                    "Tertiary Education"))
+     )
 
 
 EU_countries <- c("Austria", "Belgium", "Bulgaria", "Croatia", "Cyprus", 
@@ -56,14 +59,13 @@ Europe_countries <- c("Albania", "Andorra", "Austria",
                       "Slovakia", "Slovenia", "Spain", "Sweden", "Switzerland", "Ukraine", 
                       "UK")
 
-EU_data <- student_ratio %>% 
+# exploratory analysis ----
+
+EU_data <- student_ratio_collapse %>% 
      filter(country %in% EU_countries)
 
-EU_primary <- EU_data %>% 
-     filter(indicator == "Primary Education")
-
-EU_secondary <- EU_data %>% 
-     filter
+Europe_data <- student_ratio_collapse %>% 
+     filter(country %in% Europe_countries)
 
 # EU_data %>% distinct(country)
 # intersect(map_data$region, EU_data$country)
@@ -83,7 +85,8 @@ EU_summary <-  EU_data %>%
      ungroup()
 
 
-EU_summary %>% 
+EU_summary %>%
+     filter(indicator %in% c("Primary Education", "Secondary Education")) %>% 
      ggplot(aes(fct_reorder2(country, fct_rev(indicator), average), average, color = indicator)) +
      geom_point() +
      #scale_y_log10() +
@@ -103,20 +106,22 @@ EU_names <- map_data %>%
                mean_long = mean(long)) %>% 
      ungroup()
 
-EU_primary %>%
+EU_data %>% 
+     filter(indicator == "Primary Education") %>% 
      group_by(country) %>% 
      summarise(n = n(),
                average = mean(student_ratio, na.rm = TRUE)
      ) %>% 
      left_join(map_data, by = c("country" = "region")) %>% 
      ggplot(aes(x = long, y = lat)) +
-     geom_polygon(aes(fill = average, group = group)) +
+     geom_polygon(aes(fill = average, group = group), color = "black") +
      #geom_text(data = EU_names, aes(mean_long, mean_lat, label = region), 
-           #          size = 3, color = "yellow") +
+     #          size = 3, color = "yellow") +
      coord_map() +
      theme_minimal() +
-     scale_fill_viridis_c(option = "D")
-     #scale_fill_paletteer_c("scico", "tokyo")
+     #scale_fill_viridis_c(option = "D")
+     scale_fill_paletteer_c("ggthemes", "Red-Green Diverging") +
+     theme(plot.background = element_rect(fill = "seashell"))
 
 ### Europe Primary Ed Map ----
 primary <- student_ratio %>% 
@@ -129,10 +134,13 @@ primary <- student_ratio %>%
      ) %>% 
      left_join(map_data, by = c("country" = "region")) %>% 
      ggplot(aes(x = long, y = lat)) +
-     geom_polygon(aes(fill = average, group = group)) +
-     coord_map(ylim = c(30, 72)) +
+     geom_polygon(aes(fill = average, group = group), color = "black") +
+     coord_map("sinusoidal", ylim = c(30, 72)) +
      theme_minimal() +
-     scale_fill_viridis_c(option = "D")
+     #scale_fill_viridis_c(option = "D") +
+     scale_fill_paletteer_c("ggthemes", "Red-Green Diverging", -1) +
+     theme(plot.background = element_rect(fill = "seashell"),
+           legend.position = "top")
 
 secondary <- student_ratio_collapse %>% 
      filter(country %in% Europe_countries, indicator == "Secondary Education") %>%
@@ -148,3 +156,50 @@ secondary <- student_ratio_collapse %>%
      coord_map(ylim = c(30, 72)) +
      theme_minimal() +
      scale_fill_viridis_c(option = "D")
+
+# Change 2012 vs 2016
+student_ratio %>%
+     filter(indicator == "Primary Education", year %in% c(2012, 2016),
+            !str_detect(country_code, "^40.")) %>%
+     spread(year, student_ratio) %>% 
+     ggplot(aes(`2012`, `2016`)) +
+     geom_point() +
+     #geom_smooth() +
+     geom_abline(aes(slope = 1, intercept = 0)) +
+     scale_x_continuous(breaks = c(15, 30, 45), limits = c(10, 50)) +
+     scale_y_continuous(breaks = c(15, 30, 45), limits = c(10, 50))
+
+student_ratio %>% distinct(country) %>% view()
+
+# world map -----
+primary_mean <- student_ratio %>% 
+     filter(indicator == "Primary Education",
+            !str_detect(country_code, "^40.")) %>% 
+     group_by(country, country_code) %>% 
+     summarise(average = mean(student_ratio, na.rm = TRUE)) %>% 
+     ungroup()
+
+primary_mean %>% 
+     full_join(map_data, by = c("country_code" = "a3")) %>% 
+     ggplot(aes(long, lat, group = group)) +
+     geom_polygon(aes(fill = average)) +
+     coord_map(ylim = c(-56, 85)) +
+     scale_fill_viridis_c() +
+     theme_minimal()
+
+secondary_mean <- student_ratio %>% 
+     filter(indicator %in% c("Lower Secondary Education", "Secondary Education",
+                             "Upper Secondary Education"),
+            !str_detect(country_code, "^40.")) %>% 
+     group_by(country, country_code) %>% 
+     summarise(average = mean(student_ratio, na.rm = TRUE)) %>% 
+     ungroup()
+
+secondary_mean %>% 
+     full_join(map_data, by = c("country_code" = "a3")) %>% 
+     ggplot(aes(long, lat, group = group)) +
+     geom_polygon(aes(fill = average)) +
+     coord_map(ylim = c(-56, 85)) +
+     scale_fill_viridis_c() +
+     theme_minimal() +
+     theme(legend.position = "bottom")
