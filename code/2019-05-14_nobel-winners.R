@@ -3,7 +3,7 @@ library(ggalluvial)
 library(paletteer)
 library(cowplot)
 
-# datasets ----
+# get dataset
 nobel_winners <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-05-14/nobel_winners.csv")
 
 # change historic countries to their modern day equivalents
@@ -31,9 +31,10 @@ nobel_winners_fixed <- nobel_winners %>%
                                               "United States of America" = "USA"))
             ) %>%
      # condense countries to top 8 for less cluttered visualization
-     mutate(birth_country = fct_lump(birth_country, 7),
-            death_country = fct_lump(death_country, 7))
+     mutate(birth_country = fct_lump(birth_country, 5),
+            death_country = fct_lump(death_country, 5))
 
+# time to plot
 plot <- nobel_winners_fixed %>%
      filter(category %in% c("Medicine", "Chemistry", "Physics")) %>% 
      select(full_name, birth_country, death_country) %>%
@@ -44,22 +45,23 @@ plot <- nobel_winners_fixed %>%
      distinct() %>% 
      ggplot(aes(x = Event, stratum = Country, alluvium = full_name,
                 fill = Country, label = Country, y = 1)) +
-     geom_flow(alpha = 0.80) +
-     geom_stratum(alpha = 0.95) +
-     geom_text(stat = "stratum", size = 3) +
-     annotate("text", x = 1.5, y = -50, label = "Laureates still living were not included in the analysis") +
-     scale_x_discrete(expand = c(.1, .1), position = "top") +
-     scale_fill_paletteer_d(ggthemes, calc) +
+     geom_flow(alpha = 0.7) +
+     geom_stratum(alpha = 0.8, size = 0) +
+     geom_text(stat = "stratum", size = 4) +
+     annotate("text", x = 1.75, y = -25, 
+              label = "(Laureates still alive excluded from analysis)") +
+     scale_x_discrete(expand = c(0.1, 0.1), position = "top") +
+     scale_fill_paletteer_d(ggsci, light_uchicago) +
      labs(x = "", 
           y = "Number of Nobel Laureates",
           title = "Mobility Among Nobel Laureates in the Sciences",
           caption = "Source: Kaggle
           Visualization @Frau_Dr_Barber") +
-     theme(legend.position = "none",
-           plot.subtitle = element_text(size = 12),
+     theme(
            plot.caption = element_text(size = 9),
            axis.line = element_blank(),
-           axis.ticks = element_blank()
+           axis.ticks = element_blank(),
+           legend.position = "none",
            ) 
 
 save_plot("nobel.png", plot, base_height = 4, base_width = 6)
