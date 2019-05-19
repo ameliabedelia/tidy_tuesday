@@ -6,6 +6,9 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-05-14 Nobel Prize Winners](code/2019-05-14_nobel-winners.R)**
+![nobel winners plot](plots/nobel.png)
+
 **[2019-05-07 Student-to-Teacher Ratios](code/07-05-2019_student-to-teach-ratios.R)**
 ![teacher-ratios plot](plots/teacher_ratios_edited.png)
 
