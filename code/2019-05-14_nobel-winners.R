@@ -30,7 +30,7 @@ nobel_winners_fixed <- nobel_winners %>%
                                               "United Kingdom" = "UK",
                                               "United States of America" = "USA"))
             ) %>%
-     # condense countries to top 8 for less cluttered visualization
+     # condense countries to top 6 for less cluttered visualization
      mutate(birth_country = fct_lump(birth_country, 5),
             death_country = fct_lump(death_country, 5))
 
