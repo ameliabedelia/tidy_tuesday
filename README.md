@@ -6,6 +6,9 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-05-27 Wine Ratings](code/2019-05-27_wine-ratings.R)**
+![wine ratings plot](plots/wine.png)
+
 **[2019-05-14 Nobel Prize Winners](code/2019-05-14_nobel-winners.R)**
 ![nobel winners plot](plots/nobel.png)
 
