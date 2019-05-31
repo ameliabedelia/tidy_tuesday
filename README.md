@@ -2,6 +2,8 @@
 
 My submissions to the R4DS Tidy Tuesday project.
 
+<img src="https://github.com/rfordatascience/tidytuesday/raw/master/static/tt_logo.png" width="700">
+
 More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
