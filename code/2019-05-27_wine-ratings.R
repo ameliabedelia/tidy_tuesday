@@ -21,7 +21,7 @@ p1 <- wine_ratings %>%
      filter(price <= 20) %>%
      mutate(Color = wine_color(variety)) %>%
      add_count(variety) %>% 
-     filter(n >= 700) %>% 
+     filter(n >= 700) %>% #remove wines with low numbers of reviews for less-cluttered graph
      ggplot(aes(points, fct_reorder(variety, points))) +
      stat_density_ridges(aes(fill = Color), quantile_lines = TRUE, quantiles = 2) +
      scale_fill_manual(values = c("firebrick", "rosybrown2", "lightyellow")) +
