@@ -8,6 +8,10 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-06-03 Ramen Ratings](code/2019-06-03_ramen-ratings.R)**
+-----
+<img src="plots/ramen.png" width="600">
+
 **[2019-05-27 Wine Ratings](code/2019-05-27_wine-ratings.R)**
 ------
 <img src="plots/wine.png" width="500">
