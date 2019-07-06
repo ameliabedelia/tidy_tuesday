@@ -25,7 +25,7 @@ overall <- media_franchises %>%
      filter(str_detect(franchise, "Harry Potter")) %>% 
      distinct() %>% 
      mutate(revenue_category = fct_reorder(revenue_category, revenue)) %>% 
-     ggplot(aes(revenue_category, revenue, fill = revenue_category, label = revenue)) +
+     ggplot(aes(revenue_category, revenue, fill = revenue_category)) +
      geom_col(show.legend = FALSE) +
      coord_flip() +
      scale_fill_manual(values = rev(house_colors)) +
