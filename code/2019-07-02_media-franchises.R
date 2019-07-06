@@ -49,7 +49,7 @@ film <- hp_movie_revenue %>%
      mutate(title = str_c(c(1:8, ".", "."), ". ", title),
             title = fct_reorder(title, release),
             adjusted_gross = adjusted_gross / 10^6) %>% 
-     ggplot(aes(fct_rev(title), adjusted_gross, fill = title)) +
+     ggplot(aes(fct_rev(title), adjusted_gross)) +
      geom_col(fill = house_colors[1], show.legend = FALSE) + 
      coord_flip() +
      labs(x = "",
@@ -69,7 +69,7 @@ film <- hp_movie_revenue %>%
 #book revenue graph
 book <- hp_book_revenue %>% 
      mutate(book = str_c(1:7, ". ", book)) %>% 
-     ggplot(aes(fct_rev(book), approximate_sales_million, fill = book)) +
+     ggplot(aes(fct_rev(book), approximate_sales_million)) +
      geom_col(fill = house_colors[3], show.legend = FALSE) +
      coord_flip() +
      labs(x = "",
@@ -87,7 +87,7 @@ book <- hp_book_revenue %>%
            plot.margin = margin(0, 10, 0, 0, "lines")
      )
 
-#title
+#title & caption
 title <- ggplot(data.frame(x = 1, y = 1:10)) +
      labs(x = NULL, y = NULL,
           title = "The Magical World of Harry Potter Revenue",
