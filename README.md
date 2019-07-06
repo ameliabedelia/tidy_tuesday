@@ -10,7 +10,7 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 **[2019-07-02 Media Franchises](code/2019-07-02_media-franchises.R)**
 -----
-![harry potter plot](plots/harry_potter.png)
+![harry potter plot](plots/media_franchises.png)
 
 
 **[2019-06-03 Ramen Ratings](code/2019-06-03_ramen-ratings.R)**
