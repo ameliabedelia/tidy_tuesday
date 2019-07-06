@@ -16,8 +16,7 @@ hp_book_revenue <- read_csv2("hp_book_revenue.csv") %>%
      janitor::clean_names()
 
 # graphing ----
-house_colors <- c("#9c1203", "#FFC500", "#033807",
-                  "#00165e", "#000000", "#8A8F81")
+house_colors <- c("#9c1203", "#FFC500", "#033807", "#00165e", "#000000", "#8A8F81")
 
 background <- "#f8f2e4"
 
@@ -25,8 +24,7 @@ background <- "#f8f2e4"
 overall <- media_franchises %>% 
      filter(str_detect(franchise, "Harry Potter")) %>% 
      distinct() %>% 
-     mutate(revenue_category = fct_reorder(revenue_category, revenue),
-            total = sum(revenue)) %>% 
+     mutate(revenue_category = fct_reorder(revenue_category, revenue)) %>% 
      ggplot(aes(revenue_category, revenue, fill = revenue_category, label = revenue)) +
      geom_col(show.legend = FALSE) +
      coord_flip() +
