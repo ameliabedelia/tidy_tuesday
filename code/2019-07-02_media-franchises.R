@@ -46,7 +46,7 @@ overall <- media_franchises %>%
 #film revenue graph
 film <- hp_movie_revenue %>%
      arrange(release) %>% 
-     mutate(title = str_c(c(1:8, ".", "."), ". ", title),
+     mutate(title = str_c(c(1:6, "7a", "7b", ".", "."), ". ", title),
             title = fct_reorder(title, release),
             adjusted_gross = adjusted_gross / 10^6) %>% 
      ggplot(aes(fct_rev(title), adjusted_gross)) +
@@ -91,7 +91,7 @@ book <- hp_book_revenue %>%
 title <- ggplot(data.frame(x = 1, y = 1:10)) +
      labs(x = NULL, y = NULL,
           title = "The Magical World of Harry Potter Revenue",
-          subtitle = "The franchise has grossed an estimated 35 billion\nRevenue comes primarily from films, books, and merchandise\n"
+          subtitle = "The franchise has grossed an estimated 35 billion\nRevenue comes primarily from the box office, books, and merch\n"
           ) +
      theme(line = element_blank(),
            rect = element_rect(fill = "transparent"),
@@ -113,6 +113,7 @@ caption <- ggplot(data.frame(x = 1, y = 1:10)) +
            panel.border = element_rect(color = "transparent"),
            axis.text = element_blank())
 
+#combine plots using patchwork
 title + 
      (overall + film + book + plot_layout(widths = c(0.95, 0.75, 0.75))) + 
      caption +
