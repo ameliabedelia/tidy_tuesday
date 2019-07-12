@@ -10,7 +10,7 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 **[2019-07-09 Womens World Cup](code/2019-07-09_womens-world-cup.R)**
 -----
-<img src="plots/wwc.png" width="600">
+<img src="plots/wwc_alt_2.png" width="600">
 
 
 **[2019-07-02 Media Franchises](code/2019-07-02_media-franchises.R)**
