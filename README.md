@@ -8,6 +8,12 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+
+**[2019-3008-130 Simpsons Guest Stars](code/2019-08-30_simpsons-guest-stars.Rmd)**
+------
+<img src="plots/simpsons.png" width="700">
+
+
 **[2019-07-09 Womens World Cup](code/2019-07-09_womens-world-cup.R)**
 -----
 <img src="plots/wwc_alt_2.png" width="600">

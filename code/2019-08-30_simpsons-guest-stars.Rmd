@@ -1,0 +1,80 @@
+---
+title: 'Tidy Tuesday: Simpsons Guest Stars'
+date: '2019-08-30'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+
+```{r load packages, get data}
+library(tidyverse)
+library(cowplot)
+
+simpsons <- readr::read_delim("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-08-27/simpsons-guests.csv", delim = "|", quote = "")
+```
+
+
+```{r names to graph}
+top_stars <- simpsons %>% 
+    count(guest_star, name = "total_n", sort = TRUE) %>% 
+    head(8) 
+```
+
+
+```{r plot extras, echo=FALSE}
+simpsons_palette <- c(
+    "#FC0209", # bart red
+    "#fed90f", # simpsons yellow
+    "#46732EFF", # Flanders green 
+    "#0363C3", # marge blue
+    "#d1b271", # lightbrownbeige
+    "#7A491E", # beige 
+    "#000000",  # black
+    "#424f46"  # greyish-blue
+)
+
+# quick but messy (manual) way to get the axis labels how I want
+x_labels <- c("", "S1", "", "", "", "S5", "", "", "", "",
+              "S10", "", "", "", "", "S15", "", "", "", "",
+              "S20", "", "", "", "", "S25", "", "", "", "", "S30",
+              "", "", "", "")
+
+y_labels <- c("Marcia Wallace\n(Edna Krabappel)", 
+              "Phil Hartman\n(Troy McClure & Others)",
+              "Joe Mantegna\n(Fat Tony)",
+              "Maurice LaMache\n(Various Roles)",
+              "Kelsey Grammer\n(Sideshow Bob)", 
+              "Frank Welker\n(Various Roles)",
+              "Jon Lovitz\n(Various Roles)",
+              "Kevin Michael Richardson\n(Various Roles)")
+```
+
+
+```{r final plot, fig.width=8, fig.height=5}
+simpsons %>%
+    count(season, guest_star) %>%
+    inner_join(top_stars, by = "guest_star") %>% 
+    filter(season != "Movie") %>% # editorial choice; its not a season
+    mutate(guest_star = fct_reorder(guest_star, total_n),
+           season = fct_inseq(season)) %>% 
+    ggplot(aes(season, guest_star, label = total_n)) +
+    geom_point(aes(fill = guest_star, size = n), shape = 23, show.legend = FALSE) +
+    geom_text(data = . %>% distinct(guest_star, total_n) %>% arrange(desc(total_n)),
+              aes(x = 33.5, y = 8:1, label = total_n), family = "Akbar",
+              size = 4, hjust = 0.5) +
+    annotate("text", x = 33.5, y = 8.5, label = "# epi", family = "Akbar", 
+             hjust = 0.5, size = 4) +
+    scale_size(range = c(3, 8)) +
+    scale_x_discrete(position = "top", limits = 0:34, labels = x_labels) +
+    scale_y_discrete(labels = rev(y_labels)) +
+    labs(x = NULL, y = NULL,
+         title = "The Most Frequent Simpsons Guest Stars by Season",
+         caption = "source: Wikipedia
+         Visualization @Frau_Dr_Barber"
+         ) +
+    scale_fill_manual(values = rev(simpsons_palette)) +
+    theme_minimal_grid(font_family = "Akbar") +
+    theme(plot.title.position = "plot") #low this new feature of ggplot
+```
