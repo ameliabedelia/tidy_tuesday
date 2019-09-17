@@ -8,8 +8,12 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-09-17 National Parks Visits](code/2019-09-17_National-park-visits.R)**
+------
+<img src="plots/national_parks.png" width="700">
 
-**[2019-3008-130 Simpsons Guest Stars](code/2019-08-30_simpsons-guest-stars.Rmd)**
+
+**[2019-08-30 Simpsons Guest Stars](code/2019-08-30_simpsons-guest-stars.Rmd)**
 ------
 <img src="plots/simpsons.png" width="700">
 
