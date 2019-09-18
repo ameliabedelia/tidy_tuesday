@@ -8,8 +8,9 @@ centroids <- read_csv("~/Downloads/National_Park_Service__Park_Unit_Centroids.cs
 usa_df <- map_data("state")
 
 # calculate average visits per year for last 10 years
-ave_visits <- park_visits %>% 
-    filter(year >= 2006, unit_type == "National Park") %>% 
+ave_visits <- park_visits %>%
+    mutate(year = parse_integer(year)) %>% 
+    filter(year >= 2006, unit_type == "National Park") %>%
     group_by(unit_code) %>% 
     summarise(ave_visit = mean(visitors, na.rm = TRUE)) %>% 
     ungroup() 
