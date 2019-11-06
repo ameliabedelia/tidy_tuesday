@@ -8,6 +8,10 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-11-05 Bike & Walk Commutes](code/2019-11-05_commuting.R)**
+------
+<img src="plots/bike_commuting.png" width="700">
+
 **[2019-09-17 National Parks Visits](code/2019-09-17_National-park-visits.R)**
 ------
 <img src="plots/national_parks.png" width="700">

@@ -20,7 +20,7 @@ commute_mode %>%
     facet_wrap(vars(fct_rev(state_region)), nrow = 1) +
     labs(x = "", y = NULL,
          title = "Nobody Bikes to Work in the US - less than 1%!",
-         subtitle = "More people cycle to work in bigger cities and in the western US",
+         subtitle = "More people cycle to work in bigger cities and in the western US. Ridership is equally low throughout the south.",
          caption = glue::glue("Source: ACS - US Census
                               Visualization @frau_dr_barber")) +
     cowplot::theme_minimal_hgrid(font_family = "Roboto Condensed",
@@ -30,3 +30,5 @@ commute_mode %>%
     theme(plot.background = element_rect(fill = "grey23"),
           axis.text = element_text(color = "grey85"),
           text = element_text(color = "white"))
+
+ggsave(here::here("plots", "bike_commuting.png"))
