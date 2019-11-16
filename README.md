@@ -8,6 +8,10 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-11-12 Code in CRAN Packages](code/2019-11-12_CRAN-code.R)**
+------
+<img src="plots/cran_code.png" width="700">
+
 **[2019-11-05 Bike & Walk Commutes](code/2019-11-05_commuting.R)**
 ------
 <img src="plots/bike_commuting.png" width="700">
