@@ -1,0 +1,187 @@
+---
+title: "Phylogeny vs. popularity in the birds of New Zealand"
+author: "Amelia Barber"
+date: "11/24/2019"
+output: html_document
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+## What is the relationship between bird phylogeny and popularity?
+
+Full blogpost at https://barber.science/2019/11/24/nz-bird-phylogeny-popularity/
+
+```{r}
+library(tidyverse)
+library(wikitaxa)
+library(treeio)
+library(ggtree)
+library(patchwork)
+```
+
+```{r}
+nz_bird <- readr::read_csv("https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-11-19/nz_bird.csv")
+```
+
+## Extract the common names of the top 30 birds
+
+```{r}
+top_birds <- nz_bird %>%
+    filter(!is.na(vote_rank) & !is.na(bird_breed)) %>%
+    count(bird_breed) %>%
+    arrange(desc(n)) %>%
+    top_n(30) %>% 
+    pull(bird_breed)
+```
+
+## Using `wikitaxa` to obtain scientific names from a bird's common name
+
+```{r, cache=TRUE}
+bird_list <- top_birds %>% 
+    set_names() %>% 
+    map(wikitaxa::wt_wikispecies_search)
+```
+
+## Pluck hits from Wikispecies results list
+
+```{r}
+query_results <- map(bird_list, ~pluck(.x, "query", "search"))
+```
+
+## Condense multiple Wikispecies hits down to a single (correct) scientific name
+
+```{r}
+query_results_fulldf <- query_results %>% 
+    map_dfr(compact, .id = "common_name")
+
+bird_names <- query_results_fulldf %>% 
+    filter(!title %in% c("Black robin associated gemykibivirus 1",
+                         "Steven Chew Kea Foo",
+                         "Thyrocopa kea",
+                         "Domene tui",
+                         "Avian avulavirus 10",
+                         "Haplomitrium ovalifolium",
+                         "Cerylinae",
+                         "Sibine stimulea",
+                         "Homaloptera parclitella",
+                         "Mohoua")) %>% 
+    distinct(common_name, .keep_all = TRUE) %>%
+    select(common_name, latin_name = title) %>%
+    mutate(latin_name = str_replace_all(latin_name, 
+                                        c("Gemykibivirus" ="Petroica traversi",
+                                          "Eudyptula" = "Eudyptula minor",
+                                          "Acanthisitta chloris citrina" = "Acanthisitta chloris",
+                                          "Ixobrychus" = "Ixobrychus sturmii"
+                                          )))
+```
+
+```{r}
+missing_birds <- keep(query_results, is.null) %>% 
+    names()
+```
+
+```{r}
+missing_bird_names <- tibble(
+    common_name = missing_birds,
+    latin_name = c("Charadrius bicinctus", "Apteryx australis", "Eudyptes pachyrhynchus")
+)
+```
+
+```{r}
+bird_names_complete <- bind_rows(bird_names, missing_bird_names)
+```
+
+## Using NCBI Taxonomy to infer a phylogeny among the most popular birds of New Zealand
+
+Exported my list of newly-assembled Latin names to a text file, and uploaded that into the [NCBI Common Tree](https://www.ncbi.nlm.nih.gov/Taxonomy/CommonTree/wwwcmt.cgi) web portal
+
+```{r}
+plot_set <- bird_names_complete %>% 
+    pull(latin_name)
+
+write_lines(plot_set, here("extra_data", "sci_names.txt"))
+```
+
+## Using `treeio` to import and manipulate tree data
+
+```{r}
+raw_tree <- treeio::read.tree(here::here("extra_data", "phyliptree_fix.phy")) %>% 
+    as_tibble() %>%
+    mutate(label = str_replace_all(label, "_", " ")) %>% 
+    left_join(bird_names_complete, by = c("label" = "latin_name")) %>% 
+    mutate(label = if_else(!is.na(common_name), glue::glue("{common_name} ({label})"),
+                           label))
+tree <- treeio::as.phylo(raw_tree)
+```
+
+## Examining taxonomic relationship vs. bird popularity
+
+```{r}
+vote_df <- nz_bird %>%
+    filter(!is.na(vote_rank) & !is.na(bird_breed)) %>%
+    count(bird_breed) %>%
+    arrange(desc(n)) %>%
+    top_n(30) %>% 
+    left_join(bird_names_complete, by = c("bird_breed" = "common_name")) %>% 
+    mutate(label = glue::glue("{bird_breed} ({latin_name})")) %>% 
+    select(label, n)
+```
+
+```{r}
+highlight <- vote_df %>% 
+    head(3) %>% 
+    pull(label)
+
+colors <- c("black", "darkcyan")
+
+p1 <- ggtree(tree, branch.length = "none") +
+    geom_nodelab(geom = "label", size = 3) +
+    geom_tiplab(aes(color = label %in% highlight), show.legend = FALSE) +
+    scale_color_manual(values = colors) +
+    coord_cartesian(clip = 'off') +
+    ylim(0.5, 29.5) +
+    theme_tree2() +
+    theme(plot.margin=margin(6, 250, 6, 6),
+          axis.line.x = element_line(color = "transparent"),
+          axis.ticks.x = element_line(color = "transparent"),
+          axis.text = element_text(color = "transparent"))
+
+```
+
+## Generate bar plot
+
+```{r}
+p2 <- p1 %>% 
+    filter(isTip) %>% 
+    select(label, y) %>%
+    left_join(vote_df) %>%
+    mutate(highlight = if_else(n > 8000, "yes", "no")) %>% 
+    ggplot(aes(y, n, fill = highlight)) + 
+    geom_col(show.legend = FALSE) + 
+    scale_fill_manual(values = colors) +
+    coord_flip() +
+    annotate("text", x = 0.5, y = 12500, label = "Total # Votes", hjust = 1) +
+    xlim(0.5, 29.5) +
+    theme_tree2()
+```
+
+## Combine using patchwork
+
+```{r, fig.width=8, fig.height=7}
+p1 + p2 + plot_annotation(
+    title = "Are closely related New Zealand birds equally popular?",
+    subtitle = glue::glue("Among the 30 most popular birds in the 'NZ Bird of the Year competition'
+                          The three bird species receiving the most votes are highlighted in teal."),
+    caption = "Data: NZ Forest and Bird Organization\n Visualization @frau_dr_barber",
+    theme = cowplot::theme_map()
+    )
+
+ggsave(here::here("plots", "nz_birds.png"), width = 10, height = 7)
+```
+
+### So, are the most popular birds closely related?
+
+Not really. Looking at the plot, there doesn't seem to be a clear relationship between where a species is in the phylogeny and the number of votes they received. The three birds receiving the most votes belong to different families. The overall winner, the yellow-eyed penguin is in the _Spheniscidae_ family, the second place kākāpō (of [R4DS](https://r4ds.had.co.nz/) cover fame) is in the _Psittacidae_ family, while the third place black robin is a _passeriformes_.
+
+My guess is that bird popularity is mostly a factor of bird cuteness, which is an evolutionarily [convergent trait](https://en.wikipedia.org/wiki/Convergent_evolution), rather than arising from a particilar branch of the tree.

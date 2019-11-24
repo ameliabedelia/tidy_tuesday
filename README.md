@@ -8,6 +8,10 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-11-19 NZ Bird of the Year](code/2019-11-21_nz-birds.Rmd)**
+------
+<img src="plots/nz_birds.png" width="700">
+
 **[2019-11-12 Code in CRAN Packages](code/2019-11-12_CRAN-code.R)**
 ------
 <img src="plots/cran_code.png" width="700">
