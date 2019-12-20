@@ -8,17 +8,25 @@ More info at https://github.com/rfordatascience/tidytuesday
 
 ### Contributions ###
 
+**[2019-12-17 Dog Adoptions](code/2019-12-17_dog-adoptions.R)**
+------
+<img src="plots/dog_adoptions.png" width="600">
+
+
 **[2019-11-19 NZ Bird of the Year](code/2019-11-21_nz-birds.Rmd)**
 ------
 <img src="plots/nz_birds.png" width="700">
+
 
 **[2019-11-12 Code in CRAN Packages](code/2019-11-12_CRAN-code.R)**
 ------
 <img src="plots/cran_code.png" width="700">
 
+
 **[2019-11-05 Bike & Walk Commutes](code/2019-11-05_commuting.R)**
 ------
 <img src="plots/bike_commuting.png" width="700">
+
 
 **[2019-09-17 National Parks Visits](code/2019-09-17_National-park-visits.R)**
 ------
@@ -45,11 +53,9 @@ More info at https://github.com/rfordatascience/tidytuesday
 <img src="plots/ramen.png" width="600">
 
 
-
 **[2019-05-27 Wine Ratings](code/2019-05-27_wine-ratings.R)**
 ------
 <img src="plots/wine.png" width="500">
-
 
 
 **[2019-05-14 Nobel Prize Winners](code/2019-05-14_nobel-winners.R)**
@@ -57,17 +63,14 @@ More info at https://github.com/rfordatascience/tidytuesday
 <img src="plots/nobel.png" width="700">
 
 
-
 **[2019-05-07 Student-to-Teacher Ratios](code/07-05-2019_student-to-teach-ratios.R)**
 ------
 ![teacher-ratios plot](plots/teacher_ratios_edited.png)
 
 
-
 **[2019-04-30 Bird Collisions](code/2019-04-30_bird-collisions.R)**
 ------
 <img src="plots/bird_collisions.png" width="700">
-
 
 
 **[2019-04-23 Anime](code/2019-04-23-anime.R)**
