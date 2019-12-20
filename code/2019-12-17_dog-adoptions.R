@@ -18,7 +18,6 @@ plot_df <- tidy_dog_descriptions %>%
     mutate(prop = n / sum(n)) %>% 
     select(-n) %>%
     pivot_wider(names_from = age, values_from = prop)
-    spread(age, prop)
 
 #plot extras
 palette <- paletteer::paletteer_d("wesanderson::IsleofDogs1")
