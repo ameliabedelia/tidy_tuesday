@@ -19,7 +19,7 @@ plot_df <- tidy_dog_descriptions %>%
     select(-n) %>%
     pivot_wider(names_from = age, values_from = prop)
 
-#plot extras
+# plot extras
 palette <- paletteer::paletteer_d("wesanderson::IsleofDogs1")
 baby_fill <- palette[[1]]
 senior_fill <- palette[[2]]
@@ -42,7 +42,7 @@ annotations <- tibble(
     vjust = c(0.5, 0.5)
 )
 
-#plotting time
+# plotting time
 plot_df %>% 
     ggplot(aes(Baby, Senior)) +
     geom_polygon(data = polygon_df,
@@ -51,7 +51,6 @@ plot_df %>%
     geom_text(aes(label = word), check_overlap = TRUE, hjust = 0.5,
               family = "Futura Medium Italic") +
     scale_fill_identity() +
-    scale_color_identity() +
     scale_x_log10(labels = scales::percent, limits = c(0.00005, 0.02)) +
     scale_y_log10(labels = scales::percent, limits = c(0.00005, 0.02)) +
     geom_text(data = annotations, family = "Futura Medium", size = 6,
@@ -65,7 +64,7 @@ plot_df %>%
         ) +
     cowplot::theme_minimal_grid(font_family = "Futura Medium",
                                 rel_large = 18/14, colour = NA) +
-    theme(plot.background = element_rect(fill = bg),
+    theme(plot.background = element_rect(fill = alpha(bg, 0.85)),
           plot.title.position = "plot",
           plot.margin = margin(1, 2, 1, 1, "lines"))
 
